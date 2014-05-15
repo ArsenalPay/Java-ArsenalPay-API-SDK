@@ -1,5 +1,7 @@
 package ru.arsenalpay.api.response;
 
+import org.simpleframework.xml.Element;
+
 /**
  * <p>AbstractResponse for all api commands.</p>
  *
@@ -15,21 +17,25 @@ public abstract class AbstractResponse {
     /**
      * Payment transaction id (RRN)
      */
+    @Element(name = "rrn")
     protected final Long transactionId;
 
     /**
      * who was the payer?
      */
+    @Element(name = "phone", required = false)
     protected final Long payerId;
 
     /**
      * who was accept the payment in merchant application?
      */
+    @Element(name = "account", required = false)
     protected final Long recipientId;
 
     /**
      * what was the amount of payment?
      */
+    @Element(required = false)
     protected final Double amount;
 
     /**
