@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<main>
+    <rrn>0</rrn>
+    <account>123456789</account>
+    <phone>9140001111</phone>
+    <amount>1.25</amount>
+    <status>ERROR: Ошибка модуля МК: 20</status>
+</main>
