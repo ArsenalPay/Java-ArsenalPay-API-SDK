@@ -130,7 +130,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -158,7 +158,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -186,7 +186,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -214,7 +214,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -242,7 +242,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -271,7 +271,7 @@ public class ApiCommandsFacadeImplTest {
         );
 
         try {
-            final PaymentStatusRequest request = new PaymentStatusRequest(2096L, 0L);
+            final PaymentStatusRequest request = new PaymentStatusRequest(0L);
             final PaymentStatusResponse response = apiCommandsFacade.checkPaymentStatus(request);
 
             assertNotNull(response);

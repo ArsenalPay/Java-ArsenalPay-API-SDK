@@ -3,7 +3,8 @@ package ru.arsenalpay.api.request;
 /**
  * <p>AbstractRequest for all api commands.</p>
  *
- * <p>For different commands we need different requests.
+ * <p>This class will contain common for different requests data and methods in future.
+ * For different commands we need different requests.
  * For example for for mobile commerce we need payment request with mobile params.</p>
  *
  * <p>Feel free to add new requests witch will extend this class.</p>
@@ -13,14 +14,7 @@ package ru.arsenalpay.api.request;
  */
 public abstract class AbstractRequest {
 
-    protected final Long merchantId;
-
-    protected AbstractRequest(Long merchantId) {
-        this.merchantId = merchantId;
-    }
-
-    public Long getMerchantId() {
-        return merchantId;
+    protected AbstractRequest() {
     }
 
 }

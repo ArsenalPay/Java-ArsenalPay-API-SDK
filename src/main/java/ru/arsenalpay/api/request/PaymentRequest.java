@@ -1,7 +1,6 @@
 package ru.arsenalpay.api.request;
 
 import ru.arsenalpay.api.enums.MoneySource;
-import ru.arsenalpay.api.util.Configuration;
 
 /**
  * <p>PaymentRequest is model of payment. Contains all needed data for processing payment.</p>
@@ -53,7 +52,6 @@ public final class PaymentRequest extends AbstractRequest {
     private final Boolean isTest;
 
     private PaymentRequest(MobileBuilder mobileBuilder) {
-        super(Long.valueOf(Configuration.getProp("merchant.id")));
         this.moneySource = MoneySource.MOBILE;
         this.payerId = mobileBuilder.payerId;
         this.recipientId = mobileBuilder.recipientId;
@@ -158,7 +156,6 @@ public final class PaymentRequest extends AbstractRequest {
     @Override
     public String toString() {
         return "PaymentRequest{" +
-                "merchantId=" + merchantId +
                 ", payerId=" + payerId +
                 ", recipientId=" + recipientId +
                 ", amount=" + amount +
