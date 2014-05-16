@@ -15,7 +15,9 @@ import org.simpleframework.xml.Element;
 public abstract class AbstractResponse {
 
     /**
-     * Payment transaction id (RRN)
+     * Payment transaction id or
+     * RRN -- Acquirer Retrieval Reference Number
+     * Required field
      */
     @Element(name = "rrn")
     protected final Long transactionId;

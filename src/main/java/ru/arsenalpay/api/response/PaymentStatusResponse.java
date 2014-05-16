@@ -1,8 +1,11 @@
 package ru.arsenalpay.api.response;
 
-import com.thoughtworks.xstream.XStream;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.core.Persister;
 import ru.arsenalpay.api.enums.OperationStatus;
 import ru.arsenalpay.api.exception.ArsenalPayApiRuntimeException;
+import ru.arsenalpay.api.exception.InternalApiException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,6 +13,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static ru.arsenalpay.api.enums.OperationStatus.*;
 
 /**
@@ -19,26 +23,30 @@ import static ru.arsenalpay.api.enums.OperationStatus.*;
  *
  * @author adamether
  */
+@Root(strict = false)
 public final class PaymentStatusResponse extends AbstractResponse {
 
-    public static final String SERVER_API_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
-
-    /**
-     * String view of payment date
-     */
-    private final String datetime;
+    private static final String SERVER_API_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
     /**
      * ArsenalPay status message
      */
+    @Element(name = "status")
     private final String message;
 
-    public PaymentStatusResponse(Long transactionId,
-                                 Long payerId,
-                                 Long recipientId,
-                                 Double amount,
-                                 String message,
-                                 String datetime) {
+    /**
+     * String view of payment date
+     */
+    @Element(name = "datetime", required = false)
+    private final String datetime;
+
+    public PaymentStatusResponse(
+            @Element(name = "rrn")      Long transactionId,
+            @Element(name = "phone")    Long payerId,
+            @Element(name = "account")  Long recipientId,
+            @Element(name = "amount")   Double amount,
+            @Element(name = "status")   String message,
+            @Element(name = "datetime") String datetime) {
 
         super(transactionId, payerId, recipientId, amount);
         this.message = message;
@@ -50,6 +58,9 @@ public final class PaymentStatusResponse extends AbstractResponse {
      * @return object of {@link java.util.Date}
      */
     public Date getDate() {
+        if (isBlank(datetime)) {
+            return null;
+        }
         try {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat(SERVER_API_DATE_FORMAT);
             return simpleDateFormat.parse(datetime);
@@ -83,28 +94,25 @@ public final class PaymentStatusResponse extends AbstractResponse {
      * @param xml server api response
      * @return object of type {@link ru.arsenalpay.api.response.PaymentStatusResponse}
      */
-    public static PaymentStatusResponse fromXml(String xml) {
-        XStream xstream = new XStream();
-        /**
-         *  Using ignoreUnknownElements for tags which are not implemented yet
-         *  or has been removed and you are dealing with old xml
-         */
-        xstream.ignoreUnknownElements();
-        /**
-         * Using aliasing for mapping xml fields to fields of java pojo
-         * and main container as PaymentResponse class
-         */
-        xstream.alias("main", PaymentStatusResponse.class);
-        xstream.aliasField("rrn", PaymentStatusResponse.class, "transactionId");
-        xstream.aliasField("account", PaymentStatusResponse.class, "recipientId");
-        xstream.aliasField("phone", PaymentStatusResponse.class, "payerId");
-        xstream.aliasField("status", PaymentStatusResponse.class, "message");
+    public static PaymentStatusResponse fromXml(String xml) throws InternalApiException {
+        // PENDING: and what about message parsing? and throwing excseption?
+        return read(xml);
+    }
 
-        final PaymentStatusResponse paymentStatusResponse = (PaymentStatusResponse) xstream.fromXML(xml);
-
-        System.out.println("====== PSR: " + paymentStatusResponse);
-
-        return paymentStatusResponse;
+    /**
+     * Simple read object from xml
+     * And nothing else
+     * @param xml server api response
+     * @return object of type {@link ru.arsenalpay.api.response.PaymentStatusResponse}
+     * @throws InternalApiException while deserializing process
+     */
+    private static PaymentStatusResponse read(String xml) throws InternalApiException {
+        try {
+            Persister persister = new Persister();
+            return persister.read(PaymentStatusResponse.class, xml);
+        } catch (Exception e) {
+            throw new InternalApiException(e);
+        }
     }
 
     @Override

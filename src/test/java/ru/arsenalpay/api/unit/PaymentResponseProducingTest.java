@@ -3,7 +3,6 @@ package ru.arsenalpay.api.unit;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-import org.simpleframework.xml.core.Persister;
 import ru.arsenalpay.api.exception.ArsenalPayApiException;
 import ru.arsenalpay.api.exception.InternalApiException;
 import ru.arsenalpay.api.exception.PaymentException;
@@ -33,19 +32,22 @@ public class PaymentResponseProducingTest {
         assertEquals("OK", response.getMessage());
     }
 
-//    @Test(expected = InternalApiException.class)
     @Test
-    public void testNoException() throws Exception {
-
+    public void testEmptyXmlFieldException() throws Exception {
         try {
-            Persister persister = new Persister();
-            File file = new File("src/test/java/ru/arsenalpay/api/unit/support/api_empty_field_check_payment_status_response.xml");
-            PaymentResponse paymentResponse = persister.read(PaymentResponse.class, file);
-            System.out.println(paymentResponse);
-//            deserializeFromXml("src/test/java/ru/arsenalpay/api/unit/support/api_empty_field_check_payment_status_response.xml");
+            final PaymentResponse response = deserializeFromXml(
+                    "src/test/java/ru/arsenalpay/api/unit/support/api_empty_field_response.xml"
+            );
+            System.out.println(response);
+            assertNotNull(response);
+            assertNull(response.getPayerId());
+            assertEquals(567456755678L, response.getTransactionId().longValue());
+            assertEquals(123456L, response.getRecipientId().longValue());
+            assertTrue(new Double(52.40).equals(response.getAmount()));
+            assertEquals("OK", response.getMessage());
         } catch (Exception e) {
             e.printStackTrace(System.err);
-//            fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 

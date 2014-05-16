@@ -1,8 +1,8 @@
 package ru.arsenalpay.api.response;
 
-import com.thoughtworks.xstream.XStream;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
+import org.simpleframework.xml.core.Persister;
 import ru.arsenalpay.api.exception.ArsenalPayApiException;
 import ru.arsenalpay.api.exception.InternalApiException;
 import ru.arsenalpay.api.exception.PaymentException;
@@ -12,6 +12,14 @@ import java.util.Map;
 
 /**
  * <p>PaymentResponse is model of successful api server response.</p>
+ *
+ * We use @Root(strict = false) for for tags which are not implemented yet
+ * or has been removed and you are dealing with old xml
+ *
+ * For mapping xml fields to fields of java pojo
+ * use @Element annotation (with setting param 'name' as field alias)
+ * If field in xml can be empty use "required = false" in @Element.
+ * In this case field value will be null.
  *
  * @see ru.arsenalpay.api.facade.ApiCommandsFacade
  *
@@ -28,11 +36,11 @@ public final class PaymentResponse extends AbstractResponse {
     private final String message;
 
     public PaymentResponse(
-        @Element(name = "rrn") Long transactionId,
-        @Element(name = "phone") Long payerId,
+        @Element(name = "rrn")     Long transactionId,
+        @Element(name = "phone")   Long payerId,
         @Element(name = "account") Long recipientId,
-        @Element(name = "amount") Double amount,
-        @Element(name = "status") String message) {
+        @Element(name = "amount")  Double amount,
+        @Element(name = "status")  String message) {
 
         super(transactionId, payerId, recipientId, amount);
         this.message = message;
@@ -49,32 +57,28 @@ public final class PaymentResponse extends AbstractResponse {
      * @throws ArsenalPayApiException
      */
     public static PaymentResponse fromXml(String xml) throws ArsenalPayApiException {
-        XStream xstream = new XStream();
-        /**
-         *  Using ignoreUnknownElements for tags which are not implemented yet
-         *  or has been removed and you are dealing with old xml
-         */
-        xstream.ignoreUnknownElements();
-
-        /**
-         * Using aliasing for mapping xml fields to fields of java pojo
-         * and main container as PaymentResponse class
-         */
-        xstream.alias("main", PaymentResponse.class);
-        xstream.aliasField("rrn", PaymentResponse.class, "transactionId");
-        xstream.aliasField("account", PaymentResponse.class, "recipientId");
-        xstream.aliasField("phone", PaymentResponse.class, "payerId");
-        xstream.aliasField("status", PaymentResponse.class, "message");
-
-        // parse xml
-        final PaymentResponse paymentResponse = (PaymentResponse) xstream.fromXML(xml);
-
-        final String status = paymentResponse.getMessage();
-        // check status -> throw exception on error
+        PaymentResponse paymentResponse = read(xml);
+        String status = paymentResponse.getMessage();
         if (! "OK".equalsIgnoreCase(status)) {
             throw translateToException(status);
         }
         return paymentResponse;
+    }
+
+    /**
+     * Simple read object from xml
+     * And nothing else
+     * @param xml server api response
+     * @return object of type {@link ru.arsenalpay.api.response.PaymentResponse}
+     * @throws InternalApiException while deserializing process
+     */
+    private static PaymentResponse read(String xml) throws InternalApiException {
+        try {
+            Persister persister = new Persister();
+            return persister.read(PaymentResponse.class, xml);
+        } catch (Exception e) {
+            throw new InternalApiException(e);
+        }
     }
 
     /**
