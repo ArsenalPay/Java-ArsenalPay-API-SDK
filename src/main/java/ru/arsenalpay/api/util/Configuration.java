@@ -21,13 +21,13 @@ public final class Configuration extends Properties {
 
     private static final class InstanceHolder {
         private static final Configuration INSTANCE = new Configuration(
-                "src/main/java/ru/arsenalpay/api/conf/sdk.properties"
+                "conf/sdk.properties"
         );
     }
 
     private static final class TestInstanceHolder {
         private static final Configuration INSTANCE = new Configuration(
-                "src/main/java/ru/arsenalpay/api/conf/test-sdk.properties"
+                "conf/test-sdk.properties"
         );
     }
 
