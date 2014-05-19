@@ -17,6 +17,7 @@ import ru.arsenalpay.api.client.ApiResponseImpl;
 import ru.arsenalpay.api.command.ApiCommand;
 import ru.arsenalpay.api.enums.HttpStatus;
 import ru.arsenalpay.api.exception.InternalApiException;
+import ru.arsenalpay.api.util.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static ru.arsenalpay.api.enums.HttpMethod.GET;
+import static ru.arsenalpay.api.enums.HttpMethod.POST;
 
 /**
  *  <p>Apache Http Client impl of ApiClient interface</p>
@@ -37,6 +39,7 @@ import static ru.arsenalpay.api.enums.HttpMethod.GET;
 public class ApacheApiClientImpl implements ApiClient {
 
     private final CloseableHttpClient httpClient;
+
     private final BasicHttpContext httpContext;
 
     /**
@@ -52,8 +55,12 @@ public class ApacheApiClientImpl implements ApiClient {
     public ApiResponse executeCommand(final ApiCommand command) throws IOException, InternalApiException {
         if (command.getHttpMethod() == GET) {
             return executeGetCommand(command);
+        } else if (command.getHttpMethod() == POST) {
+            return executePostCommand(command);
+        } else {
+            String message = String.format("Http method is not supported: [%s]", command.getHttpMethod());
+            throw new InternalApiException(message);
         }
-        return executePostCommand(command);
     }
 
     /**
@@ -65,6 +72,9 @@ public class ApacheApiClientImpl implements ApiClient {
      */
     private ApiResponse executeGetCommand(ApiCommand command) throws IOException, InternalApiException {
         HttpGet httpGet = new HttpGet(command.getFullUri());
+
+        Logger.info("[GET] : [%s]", command.getFullUri());
+
         return getApiResponse(httpGet);
     }
 
@@ -80,6 +90,9 @@ public class ApacheApiClientImpl implements ApiClient {
         // set post params using command.getParams()
         List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
         Map<String, String> params = command.getParams();
+
+        Logger.info("[POST] : [%s], [%s]", command.getBaseUri(), command.getParams());
+
         for (Map.Entry<String, String> entry : params.entrySet()) {
             urlParameters.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
         }
@@ -99,15 +112,15 @@ public class ApacheApiClientImpl implements ApiClient {
      * @throws ru.arsenalpay.api.exception.InternalApiException
      */
     private ApiResponse getApiResponse(final HttpUriRequest request) throws IOException, InternalApiException {
-        // TODO: replace with logger in release
-        System.out.println(request.getMethod() + " : " + request.getURI());
-
         final CloseableHttpResponse httpResponse = httpClient.execute(request, httpContext);
         try {
             HttpEntity entity = httpResponse.getEntity();
             if (entity != null) {
                 final int code = httpResponse.getStatusLine().getStatusCode();
                 final String body = EntityUtils.toString(entity);
+
+                Logger.info("[HTTP STATUS]: [%s], [HTTP RESPONSE]: [%s]", code, body);
+
                 if (isBlank(body)) {
                     throw new InternalApiException("Api response is blank.");
                 }
