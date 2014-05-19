@@ -15,6 +15,7 @@ import ru.arsenalpay.api.request.PaymentStatusRequest;
 import ru.arsenalpay.api.response.PaymentResponse;
 import ru.arsenalpay.api.response.PaymentStatusResponse;
 import ru.arsenalpay.api.util.Configuration;
+import ru.arsenalpay.api.util.LoggerManager;
 import ru.arsenalpay.api.util.MultiThreadedHttpClient;
 
 import java.io.IOException;
@@ -62,6 +63,7 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
                 Configuration.getProp("merchant.id"),
                 Configuration.getProp("merchant.secret")
         );
+        LoggerManager.init();
     }
 
     /**
@@ -76,6 +78,7 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
                 Configuration.getProp("merchant.id"),
                 Configuration.getProp("merchant.secret")
         );
+        LoggerManager.init();
     }
 
     @Override
