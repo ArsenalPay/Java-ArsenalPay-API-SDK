@@ -52,6 +52,21 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
     private final MerchantCredentials credentials;
 
     /**
+     * This is default constructor with ApacheApiClientImpl as ApiClient implementation.
+     * HttpClient is configured for work in concurrency environment.
+     */
+    public ApiCommandsFacadeImpl() {
+        this.apiClient = new ApacheApiClientImpl(
+                MultiThreadedHttpClient.getInstance().getHttpClient()
+        );
+        this.credentials = new MerchantCredentials(
+                Configuration.getProp("merchant.id"),
+                Configuration.getProp("merchant.secret")
+        );
+        LoggerManager.init();
+    }
+
+    /**
      * This constructor is for your freedom.
      * Simply implement ApiClient interface with your favorite http client with your configuration and
      * ApiCommandsFacade will use it for communication with ArsenalPay Server API.
@@ -67,17 +82,28 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
     }
 
     /**
-     * This is default constructor with ApacheApiClientImpl as ApiClient implementation.
      * HttpClient is configured for work in concurrency environment.
+     * MerchantCredentials are id and secret given to you at registration.
+     * Take a note: merchantCredentials witch were set in conf/sdk.properties will be ignored!
      */
-    public ApiCommandsFacadeImpl() {
-        apiClient = new ApacheApiClientImpl(
+    public ApiCommandsFacadeImpl(MerchantCredentials merchantCredentials) {
+        this.apiClient = new ApacheApiClientImpl(
                 MultiThreadedHttpClient.getInstance().getHttpClient()
         );
-        this.credentials = new MerchantCredentials(
-                Configuration.getProp("merchant.id"),
-                Configuration.getProp("merchant.secret")
-        );
+        this.credentials = merchantCredentials;
+        LoggerManager.init();
+    }
+
+    /**
+     * This constructor is for your absolute freedom.
+     * This is constructor with ApacheApiClientImpl as ApiClient implementation and merchantCredentials.
+     * HttpClient is configured for work in concurrency environment.
+     * MerchantCredentials are id and secret given to you at registration.
+     * Take a note: merchantCredentials witch were set in conf/sdk.properties will be ignored!
+     */
+    public ApiCommandsFacadeImpl(ApiClient apiClient, MerchantCredentials merchantCredentials) {
+        this.apiClient = apiClient;
+        this.credentials = merchantCredentials;
         LoggerManager.init();
     }
 
