@@ -27,7 +27,7 @@ public final class PaymentRequest extends AbstractRequest {
     private final Long recipientId;
 
     /**
-     * what is the amount of charge?
+     * what is the amount of charge? Restrictions are: from 10 to 15000 'RUB' now.
      */
     private final Double amount;
 
@@ -93,6 +93,7 @@ public final class PaymentRequest extends AbstractRequest {
 
         /**
          * what is the amount of charge?
+         * restrictions are: from 10 to 15000 'RUB' now
          */
         public MobileBuilder amount(Double value) {
             this.amount = value;
