@@ -29,6 +29,7 @@ public final class LoggerManager {
 
             Logger.debug("Loading log4j from: [%s]", configFilePath);
         } catch (Exception e) {
+            e.printStackTrace();
             Logger.warn("./log4j.properties does not exists in current dir, use default values");
         }
     }
