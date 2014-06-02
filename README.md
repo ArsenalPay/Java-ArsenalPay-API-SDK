@@ -10,13 +10,19 @@ fast simple and seamless integration your java application with payments process
 Version
 ----
 
-0.9
+1.0
 
-<p>The functional of API</p>
+Building
+----
 
-<p>Now there is only mobile payments api methods:</p>
+``mvn package`` for building single jar file with all dependencies.
 
-<p>RequestPayment method. Example code:</p>
+Functions of API
+----
+
+- Mobile commerce.
+
+<b>RequestPayment method. Example code for mobile charge:</b>
 
 ```java 
 PaymentRequest paymentRequest = new PaymentRequest.MobileBuilder()
@@ -31,10 +37,12 @@ PaymentRequest paymentRequest = new PaymentRequest.MobileBuilder()
 PaymentResponse paymentResponse = apiCommandsFacade.requestPayment(paymentRequest);
 ```        
 
-<p>CheckPaymentStatus method. Example code:</p>
+<b>CheckPaymentStatus method. Example code:</b>
 
-```java 
-PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 123345L);
+```java  
+PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(123345L);
+
+// where 123345 is transaction id
 
 PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 ``` 
