@@ -4,6 +4,7 @@ import org.apache.commons.lang.ObjectUtils;
 import ru.arsenalpay.api.command.ApiCommand;
 import ru.arsenalpay.api.command.ApiCommandProducer;
 import ru.arsenalpay.api.enums.HttpMethod;
+import ru.arsenalpay.api.merchant.MerchantCredentials;
 import ru.arsenalpay.api.request.AbstractRequest;
 import ru.arsenalpay.api.request.PaymentRequest;
 import ru.arsenalpay.api.request.PaymentStatusRequest;
@@ -45,16 +46,13 @@ public final class ApiCommandProducerImpl implements ApiCommandProducer {
      * ex we need PaymentRequest for getting INIT_PAY_MK command
      */
     private final AbstractRequest request;
+    private final MerchantCredentials credentials;
 
-    /**
-     * merchant pass (available at merchant registration with id)
-     */
-    private final String password;
 
-    public ApiCommandProducerImpl(String commandName, AbstractRequest request, String password) {
+    public ApiCommandProducerImpl(String commandName, AbstractRequest request, MerchantCredentials credentials) {
         this.commandName = commandName;
         this.request = request;
-        this.password = password;
+        this.credentials = credentials;
     }
 
     @Override
@@ -88,10 +86,12 @@ public final class ApiCommandProducerImpl implements ApiCommandProducer {
         }
         final PaymentRequest paymentRequest = (PaymentRequest) request;
 
-        final String id = ObjectUtils.toString(paymentRequest.getMerchantId());
         final String account = ObjectUtils.toString(paymentRequest.getRecipientId());
         final String phone = ObjectUtils.toString(paymentRequest.getPayerId());
         final String amount = ObjectUtils.toString(paymentRequest.getAmount());
+
+        final String id = credentials.getId();
+        final String secret = credentials.getSecret();
 
         Map<String, String> params = new HashMap<String, String>() {{
             put("ID", id);
@@ -102,7 +102,7 @@ public final class ApiCommandProducerImpl implements ApiCommandProducer {
             put("CURRENCY", "RUR");
         }};
 
-        final String signature = getSignature(password, id, INIT_PAY_MK, account, phone, amount);
+        final String signature = getSignature(secret, id, INIT_PAY_MK, account, phone, amount);
         params.put("SIGN", signature);
 
         final String baseUri = MessageFormat.format("{0}/{1}/", SERVER_API_HOST, INIT_PAY_MK);
@@ -129,8 +129,10 @@ public final class ApiCommandProducerImpl implements ApiCommandProducer {
         }
         final PaymentStatusRequest statusRequest = (PaymentStatusRequest) request;
 
-        final String id = ObjectUtils.toString(statusRequest.getMerchantId());
         final String rrn = ObjectUtils.toString(statusRequest.getTransactionId());
+
+        final String id = credentials.getId();
+        final String secret = credentials.getSecret();
 
         Map<String, String> params = new HashMap<String, String>() {{
             put("ID", id);
@@ -138,7 +140,7 @@ public final class ApiCommandProducerImpl implements ApiCommandProducer {
             put("RRN", rrn);
         }};
 
-        final String signature = getSignature(password, id, INIT_PAY_MK_STATUS, rrn);
+        final String signature = getSignature(secret, id, INIT_PAY_MK_STATUS, rrn);
         params.put("SIGN", signature);
 
         final String baseUri = MessageFormat.format("{0}/{1}/", SERVER_API_HOST, INIT_PAY_MK);

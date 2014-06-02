@@ -9,16 +9,19 @@ import ru.arsenalpay.api.command.impl.ApiCommandProducerImpl;
 import ru.arsenalpay.api.exception.ArsenalPayApiException;
 import ru.arsenalpay.api.exception.InternalApiException;
 import ru.arsenalpay.api.facade.ApiCommandsFacade;
+import ru.arsenalpay.api.merchant.MerchantCredentials;
 import ru.arsenalpay.api.request.PaymentRequest;
 import ru.arsenalpay.api.request.PaymentStatusRequest;
 import ru.arsenalpay.api.response.PaymentResponse;
 import ru.arsenalpay.api.response.PaymentStatusResponse;
 import ru.arsenalpay.api.util.Configuration;
+import ru.arsenalpay.api.util.LoggerManager;
 import ru.arsenalpay.api.util.MultiThreadedHttpClient;
 
 import java.io.IOException;
 
-import static ru.arsenalpay.api.command.impl.ApiCommandProducerImpl.*;
+import static ru.arsenalpay.api.command.impl.ApiCommandProducerImpl.INIT_PAY_MK;
+import static ru.arsenalpay.api.command.impl.ApiCommandProducerImpl.INIT_PAY_MK_STATUS;
 
 /**
  * <p>The main and now a single implementation of ApiCommandsFacade.</p>
@@ -41,7 +44,27 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
     /**
      * ApiClient concrete implementation
      */
-    private ApiClient apiClient;
+    private final ApiClient apiClient;
+
+    /**
+     * Private secret merchant credentials
+     */
+    private final MerchantCredentials credentials;
+
+    /**
+     * This is default constructor with ApacheApiClientImpl as ApiClient implementation.
+     * HttpClient is configured for work in concurrency environment.
+     */
+    public ApiCommandsFacadeImpl() {
+        this.apiClient = new ApacheApiClientImpl(
+                MultiThreadedHttpClient.getInstance().getHttpClient()
+        );
+        this.credentials = new MerchantCredentials(
+                Configuration.getProp("merchant.id"),
+                Configuration.getProp("merchant.secret")
+        );
+        LoggerManager.init();
+    }
 
     /**
      * This constructor is for your freedom.
@@ -51,22 +74,42 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
      */
     public ApiCommandsFacadeImpl(ApiClient apiClient) {
         this.apiClient = apiClient;
+        this.credentials = new MerchantCredentials(
+                Configuration.getProp("merchant.id"),
+                Configuration.getProp("merchant.secret")
+        );
+        LoggerManager.init();
     }
 
     /**
-     * This is default constructor with ApacheApiClientImpl as ApiClient implementation.
      * HttpClient is configured for work in concurrency environment.
+     * MerchantCredentials are id and secret given to you at registration.
+     * Take a note: merchantCredentials witch were set in conf/sdk.properties will be ignored!
      */
-    public ApiCommandsFacadeImpl() {
-        apiClient = new ApacheApiClientImpl(
+    public ApiCommandsFacadeImpl(MerchantCredentials merchantCredentials) {
+        this.apiClient = new ApacheApiClientImpl(
                 MultiThreadedHttpClient.getInstance().getHttpClient()
         );
+        this.credentials = merchantCredentials;
+        LoggerManager.init();
+    }
+
+    /**
+     * This constructor is for your absolute freedom.
+     * This is constructor with ApacheApiClientImpl as ApiClient implementation and merchantCredentials.
+     * HttpClient is configured for work in concurrency environment.
+     * MerchantCredentials are id and secret given to you at registration.
+     * Take a note: merchantCredentials witch were set in conf/sdk.properties will be ignored!
+     */
+    public ApiCommandsFacadeImpl(ApiClient apiClient, MerchantCredentials merchantCredentials) {
+        this.apiClient = apiClient;
+        this.credentials = merchantCredentials;
+        LoggerManager.init();
     }
 
     @Override
     public PaymentResponse requestPayment(PaymentRequest request) throws ArsenalPayApiException {
-        final String password = Configuration.getProp("merchant.password");
-        ApiCommandProducer producer = new ApiCommandProducerImpl(INIT_PAY_MK, request, password);
+        ApiCommandProducer producer = new ApiCommandProducerImpl(INIT_PAY_MK, request, credentials);
         ApiCommand command = producer.getCommand();
         try {
             final ApiResponse apiResponse = apiClient.executeCommand(command);
@@ -79,8 +122,7 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
 
     @Override
     public PaymentStatusResponse checkPaymentStatus(PaymentStatusRequest request) throws InternalApiException {
-        final String password = Configuration.getProp("merchant.password");
-        ApiCommandProducerImpl producer = new ApiCommandProducerImpl(INIT_PAY_MK_STATUS, request, password);
+        ApiCommandProducerImpl producer = new ApiCommandProducerImpl(INIT_PAY_MK_STATUS, request, credentials);
         ApiCommand command = producer.getCommand();
         try {
             final ApiResponse apiResponse = apiClient.executeCommand(command);

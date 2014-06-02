@@ -11,7 +11,7 @@ fast simple and seamless integration your java application with processing serve
 Version
 ----
 
-0.9
+1.0
 
 JDK version requirements
 ----
@@ -23,37 +23,57 @@ Source
 
 <a href="https://arsenalpay.ru/site/integration">Official integration guide page</a>
 
-Description of the protocol.
+Building artifact
 ----
 
-<br/>
-<p><b>Take a note!</b> There are only mobile payments api methods now.</p>
+``mvn package`` for building single jar file with all dependencies.
 
-<p>RequestPayment method. Example code:</p>
+Configuration
+----
+
+Copy ``conf`` with properties to the root directory of your project 
+another you will get ``ConfigurationLoadingException`` 
+
+
+Functions of API
+----
+
+- Mobile commerce.
+
+<b>RequestPayment method. Example code for mobile charge:</b>
 
 ```java 
-ApiCommandsFacade apiCommandsFacade = new ApiCommandsFacadeImpl();
+
+ApiCommandsFacade apiCommandsFacade = new ApiCommandsFacadeImpl(
+        new MerchantCredentials("2096", "qwerty")
+);
 
 PaymentRequest paymentRequest = new PaymentRequest.MobileBuilder()
-                .payerId(9140001111L)
-                .recipientId(123456789L)
-                .amount(1.25D)
-                .currency("RUR")
-                .comment("Java-SDK-Test")
-                .setTestMode()
-                .build();
+        .payerId(9140001111L)
+        .recipientId(123456789L)
+        .amount(12.5D)
+        .currency("RUR")
+        .comment("Java-SDK-Test")
+        .setTestMode()
+        .build();
 
 PaymentResponse paymentResponse = apiCommandsFacade.requestPayment(paymentRequest);
+
 ```        
 
-<p>CheckPaymentStatus method. Example code:</p>
+<p>See more details in JavaDoc.</p>
 
-```java 
-ApiCommandsFacade apiCommandsFacade = new ApiCommandsFacadeImpl();
+<b>CheckPaymentStatus method. Example code:</b>
 
-// set your merchant id and transaction id
-PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 123345L);
+```java  
 
-PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
-``` 
+PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(
+        new PaymentStatusRequest(1228221L)
+);
+
+// where 1228221 is payment transaction id
+
+```
+
+<p>See more details in JavaDoc.</p>
 

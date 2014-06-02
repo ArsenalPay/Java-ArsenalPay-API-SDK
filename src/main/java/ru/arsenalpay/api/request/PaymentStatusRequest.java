@@ -14,8 +14,7 @@ public final class PaymentStatusRequest extends AbstractRequest {
      */
     private final Long transactionId;
 
-    public PaymentStatusRequest(Long merchantId, Long transactionId) {
-        super(merchantId);
+    public PaymentStatusRequest(Long transactionId) {
         this.transactionId = transactionId;
     }
 

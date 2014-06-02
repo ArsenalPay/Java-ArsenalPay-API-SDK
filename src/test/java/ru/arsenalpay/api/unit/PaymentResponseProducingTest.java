@@ -32,6 +32,25 @@ public class PaymentResponseProducingTest {
         assertEquals("OK", response.getMessage());
     }
 
+    @Test
+    public void testEmptyXmlFieldException() throws Exception {
+        try {
+            final PaymentResponse response = deserializeFromXml(
+                    "src/test/java/ru/arsenalpay/api/unit/support/api_empty_field_response.xml"
+            );
+            System.out.println(response);
+            assertNotNull(response);
+            assertNull(response.getPayerId());
+            assertEquals(567456755678L, response.getTransactionId().longValue());
+            assertEquals(123456L, response.getRecipientId().longValue());
+            assertTrue(new Double(52.40).equals(response.getAmount()));
+            assertEquals("OK", response.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            fail(e.getMessage());
+        }
+    }
+
     @Test(expected = InternalApiException.class)
     public void testUnknownErrorStatus() throws Exception {
         deserializeFromXml("src/test/java/ru/arsenalpay/api/unit/support/api_error_response.xml");

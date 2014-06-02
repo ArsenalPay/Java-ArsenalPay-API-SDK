@@ -130,7 +130,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -158,7 +158,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -186,7 +186,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -214,7 +214,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -242,7 +242,7 @@ public class ApiCommandsFacadeImplTest {
                 new ApacheApiClientImpl(httpClientMock)
         );
 
-        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(2096L, 0L);
+        final PaymentStatusRequest paymentStatusRequest = new PaymentStatusRequest(0L);
 
         final PaymentStatusResponse paymentStatusResponse = apiCommandsFacade.checkPaymentStatus(paymentStatusRequest);
 
@@ -255,6 +255,36 @@ public class ApiCommandsFacadeImplTest {
         assertEquals(OperationStatus.IN_PROGRESS, paymentStatusResponse.getMessage());
     }
 
-    // TODO: need test for empty tags in api server response
+    @Test
+    public void testEmptyTagPaymentStatus() throws Exception {
+        System.out.println("ApiCommandsFacadeImplTest ---> testEmptyTagPaymentStatus");
+
+        File file = new File(
+                "src/test/java/ru/arsenalpay/api/unit/support/api_empty_field_payment_status_response.xml"
+        );
+        InputStream content = new FileInputStream(file);
+        when(httpEntityMock.getContent()).thenReturn(content);
+        when(httpClientMock.execute(isA(HttpPost.class), isA(HttpContext.class))).thenReturn(httpResponseMock);
+
+        ApiCommandsFacade apiCommandsFacade = new ApiCommandsFacadeImpl(
+                new ApacheApiClientImpl(httpClientMock)
+        );
+
+        try {
+            final PaymentStatusRequest request = new PaymentStatusRequest(0L);
+            final PaymentStatusResponse response = apiCommandsFacade.checkPaymentStatus(request);
+
+            assertNotNull(response);
+            assertEquals(1159374L, response.getTransactionId().longValue());
+            assertNull(response.getRecipientId());
+            assertNull(response.getPayerId());
+            assertNull(response.getAmount());
+            assertNull(response.getDate());
+            assertEquals(OperationStatus.REFUSED, response.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+            fail(e.getMessage());
+        }
+    }
 
 }
