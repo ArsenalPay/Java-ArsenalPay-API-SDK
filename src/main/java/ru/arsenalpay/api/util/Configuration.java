@@ -15,19 +15,25 @@ import java.util.Properties;
  */
 public final class Configuration extends Properties {
 
+    /**
+     * Path relative to root of your project
+     */
+    public static final String CONF_SDK_PROPERTIES = "conf/sdk.properties";
+    public static final String CONF_TEST_SDK_PROPERTIES = "conf/test-sdk.properties";
+
     private Configuration(String pathToProperty) {
         read(pathToProperty);
     }
 
     private static final class InstanceHolder {
         private static final Configuration INSTANCE = new Configuration(
-                "conf/sdk.properties"
+                CONF_SDK_PROPERTIES
         );
     }
 
     private static final class TestInstanceHolder {
         private static final Configuration INSTANCE = new Configuration(
-                "conf/test-sdk.properties"
+                CONF_TEST_SDK_PROPERTIES
         );
     }
 
@@ -45,9 +51,10 @@ public final class Configuration extends Properties {
      */
     public void read(String pathToProperty) {
         try {
+            Logger.debug("Working Directory = " + System.getProperty("user.dir"));
             load(new FileReader(pathToProperty));
         } catch (IOException e) {
-            throw new ConfigurationLoadingException();
+            throw new ConfigurationLoadingException(e);
         }
     }
 
