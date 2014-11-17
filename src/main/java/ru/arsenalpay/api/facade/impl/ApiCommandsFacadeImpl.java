@@ -5,7 +5,8 @@ import ru.arsenalpay.api.client.ApiResponse;
 import ru.arsenalpay.api.client.impl.ApacheApiClientImpl;
 import ru.arsenalpay.api.command.ApiCommand;
 import ru.arsenalpay.api.command.ApiCommandProducer;
-import ru.arsenalpay.api.command.impl.ApiCommandProducerImpl;
+import ru.arsenalpay.api.command.impl.InitPayMkProducer;
+import ru.arsenalpay.api.command.impl.InitPayMkStatusProducer;
 import ru.arsenalpay.api.exception.ArsenalPayApiException;
 import ru.arsenalpay.api.exception.InternalApiException;
 import ru.arsenalpay.api.facade.ApiCommandsFacade;
@@ -19,9 +20,6 @@ import ru.arsenalpay.api.util.LoggerManager;
 import ru.arsenalpay.api.util.MultiThreadedHttpClient;
 
 import java.io.IOException;
-
-import static ru.arsenalpay.api.command.impl.ApiCommandProducerImpl.INIT_PAY_MK;
-import static ru.arsenalpay.api.command.impl.ApiCommandProducerImpl.INIT_PAY_MK_STATUS;
 
 /**
  * <p>The main and now a single implementation of ApiCommandsFacade.</p>
@@ -109,7 +107,7 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
 
     @Override
     public PaymentResponse requestPayment(PaymentRequest request) throws ArsenalPayApiException {
-        ApiCommandProducer producer = new ApiCommandProducerImpl(INIT_PAY_MK, request, credentials);
+        ApiCommandProducer producer = new InitPayMkProducer(request, credentials);
         ApiCommand command = producer.getCommand();
         try {
             final ApiResponse apiResponse = apiClient.executeCommand(command);
@@ -122,7 +120,7 @@ public class ApiCommandsFacadeImpl implements ApiCommandsFacade {
 
     @Override
     public PaymentStatusResponse checkPaymentStatus(PaymentStatusRequest request) throws InternalApiException {
-        ApiCommandProducerImpl producer = new ApiCommandProducerImpl(INIT_PAY_MK_STATUS, request, credentials);
+        ApiCommandProducer producer = new InitPayMkStatusProducer(request, credentials);
         ApiCommand command = producer.getCommand();
         try {
             final ApiResponse apiResponse = apiClient.executeCommand(command);

@@ -4,7 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import ru.arsenalpay.api.command.ApiCommand;
 import ru.arsenalpay.api.command.ApiCommandProducer;
-import ru.arsenalpay.api.command.impl.ApiCommandProducerImpl;
+import ru.arsenalpay.api.command.impl.InitPayMkProducer;
+import ru.arsenalpay.api.command.impl.InitPayMkStatusProducer;
 import ru.arsenalpay.api.merchant.MerchantCredentials;
 import ru.arsenalpay.api.request.PaymentRequest;
 import ru.arsenalpay.api.request.PaymentStatusRequest;
@@ -37,7 +38,7 @@ public class ApiCommandProducerImplTest {
     @Test
     public void testProduceInitPayMkCommand() throws Exception {
         final MerchantCredentials credentials = new MerchantCredentials("2096", "123456");
-        ApiCommandProducer producer = new ApiCommandProducerImpl("init_pay_mk", paymentRequest, credentials);
+        ApiCommandProducer producer = new InitPayMkProducer(paymentRequest, credentials);
         final ApiCommand apiCommand = producer.getCommand();
 
         assertNotNull(apiCommand);
@@ -70,7 +71,7 @@ public class ApiCommandProducerImplTest {
     @Test
     public void testProduceInitPayMkStatus() throws Exception {
         final MerchantCredentials credentials = new MerchantCredentials("2096", "123456");
-        ApiCommandProducer producer = new ApiCommandProducerImpl("init_pay_mk_status", paymentStatusRequest, credentials);
+        ApiCommandProducer producer = new InitPayMkStatusProducer(paymentStatusRequest, credentials);
         final ApiCommand apiCommand = producer.getCommand();
 
         assertNotNull(apiCommand);
