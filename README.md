@@ -21,7 +21,7 @@ min 1.6
 Source
 ----
 
-<a href="https://arsenalpay.ru/site/integration">Official integration guide page</a>
+<a href="https://arsenalpay.ru/developers.html">Official integration guide page</a>
 
 Building artifact
 ----
